@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-01-17 02:43:16
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-01-17 04:40:09
+LastEditTime : 2025-01-17 04:42:32
 FilePath     : /LMP1210_Winter_2025/A1/A1_code.py
 Description  : python script for problem 4,5,6 in A1
 I Love IU
@@ -17,11 +17,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 from graphviz import Source
 from typing import Tuple
-
+# import matplotlib
 # matplotlib.use("TkAgg")
 
 
@@ -41,8 +40,6 @@ def load_data(
     print(f"Validation set size: {len(valid_data)}")
     print(f"Test set size: {len(test_data)}")
     X_train, y_train = train_data.iloc[:, :-1], train_data.iloc[:, -1]
-    print(type(X_train))
-    exit()
     X_valid, y_valid = valid_data.iloc[:, :-1], valid_data.iloc[:, -1]
     X_test, y_test = test_data.iloc[:, :-1], test_data.iloc[:, -1]
     return X_train, y_train, X_valid, y_valid, X_test, y_test
@@ -117,7 +114,7 @@ def train_decision_tree(
         export_graphviz(classifier, out_file=None, feature_names=X_train.columns)
     )
     graph.format = "png"
-    graph.render(f"dt_{min_samples_leaf}", view=True)
+    graph.render(f"dt_min_sample_leaf_{min_samples_leaf}", view=True)
 
 
 def train_logistic_regression(
