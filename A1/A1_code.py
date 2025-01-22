@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-01-17 02:43:16
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-01-17 04:42:32
+LastEditTime : 2025-01-22 00:27:30
 FilePath     : /LMP1210_Winter_2025/A1/A1_code.py
 Description  : python script for problem 4,5,6 in A1
 I Love IU
@@ -94,7 +94,10 @@ def train_decision_tree(
     min_samples_leaf: int = 1,
 ) -> None:
     classifier = DecisionTreeClassifier(
-        criterion="gini", splitter="best", min_samples_leaf=min_samples_leaf
+        criterion="gini",
+        splitter="best",
+        min_samples_leaf=min_samples_leaf,
+        random_state=1,
     )
     classifier.fit(X_train, y_train)
     acc_train = classifier.score(X_train, y_train)
