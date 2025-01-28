@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-01-17 02:43:16
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-01-22 00:27:30
+LastEditTime : 2025-01-28 18:30:48
 FilePath     : /LMP1210_Winter_2025/A1/A1_code.py
 Description  : python script for problem 4,5,6 in A1
 I Love IU
@@ -76,12 +76,33 @@ def select_knn_model(
     plt.title(f"KNN Accuracy vs k using {metric} distance")
     fig.savefig(f"knn_accuracy_{metric}.png")
 
-    best_acc_val_ind = np.argmax(acc_valid[:, -1])
-    best_k = int(acc_valid[best_acc_val_ind, 1])
-    best_acc_val = acc_valid[best_acc_val_ind, -1]
-    print(f"Best k: {best_k} / Best KNN validation accuracy: {best_acc_val}")
-    acc_test = acc_valid[best_acc_val_ind, 0].score(X_test, y_test)
-    print(f"KNN Test accuracy: {acc_test}\n")
+    # Find the best k, if k is tied, choose the k with the smallest gap between training and validation accuracy
+    best_acc = -float("inf")
+    best_k = -1
+    best_k_ind = -1
+    best_gap = float("inf")
+    for count, (i, j) in enumerate(zip(acc_train, acc_valid)):
+        train_acc = i[1]
+        valid_acc = j[2]
+        gap = abs(train_acc - valid_acc)
+        if valid_acc > best_acc:
+            best_acc = valid_acc
+            best_k = i[0]
+            best_k_ind = count
+            best_gap = gap
+        elif valid_acc == best_acc:
+            if gap < best_gap:
+                best_k = i[0]
+                best_k_ind = count
+                best_gap = gap
+    print(
+        f"-----------------------{metric.capitalize()} Distance-----------------------"
+    )
+    print(
+        f"Best k: {int(best_k)} / Best KNN validation accuracy: {best_acc} / Train-Valid Gap: {best_gap}"
+    )
+    acc_test = acc_valid[best_k_ind][0].score(X_test, y_test)
+    print(f"Test accuracy: {acc_test}\n")
 
 
 def train_decision_tree(
@@ -104,14 +125,11 @@ def train_decision_tree(
     acc_valid = classifier.score(X_valid, y_valid)
     acc_test = classifier.score(X_test, y_test)
     print(
-        f"Decision Tree Training Accuracy with min_sample_leaf {min_samples_leaf}: {acc_train}"
+        f"------------Decision Tree with Min Sample Leaf {min_samples_leaf}-------------"
     )
-    print(
-        f"Decision Tree Validation Accuracy with min_sample_leaf {min_samples_leaf}: {acc_valid}"
-    )
-    print(
-        f"Decision Tree Test Accuracy with min_sample_leaf {min_samples_leaf}: {acc_test}\n"
-    )
+    print(f"Training Accuracy: {acc_train}")
+    print(f"Validation Accuracy: {acc_valid}")
+    print(f"Test Accuracy: {acc_test}\n")
 
     graph = Source(
         export_graphviz(classifier, out_file=None, feature_names=X_train.columns)
@@ -133,9 +151,10 @@ def train_logistic_regression(
     acc_train = classifier.score(X_train, y_train)
     acc_valid = classifier.score(X_valid, y_valid)
     acc_test = classifier.score(X_test, y_test)
-    print(f"Logistic Regression Training Accuracy: {acc_train}")
-    print(f"Logistic Regression Validation Accuracy: {acc_valid}")
-    print(f"Logistic Regression Test Accuracy: {acc_test}\n")
+    print("---------------------Logistic Regression---------------------")
+    print(f"Training Accuracy: {acc_train}")
+    print(f"Validation Accuracy: {acc_valid}")
+    print(f"Test Accuracy: {acc_test}")
 
 
 if __name__ == "__main__":
