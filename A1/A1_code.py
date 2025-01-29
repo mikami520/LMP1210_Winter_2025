@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-01-17 02:43:16
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-01-28 18:30:48
+LastEditTime : 2025-01-29 11:31:49
 FilePath     : /LMP1210_Winter_2025/A1/A1_code.py
 Description  : python script for problem 4,5,6 in A1
 I Love IU
@@ -20,8 +20,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from graphviz import Source
 from typing import Tuple
-# import matplotlib
-# matplotlib.use("TkAgg")
 
 
 def load_data(
@@ -62,7 +60,7 @@ def select_knn_model(
         acc_val = classifier.score(X_valid, y_valid)
         acc_train.append([k, acc_tr])
         acc_valid.append([classifier, k, acc_val])
-        # print(f"k: {k} / Training Accuracy: {acc_tr} / Validation Accuracy: {acc_val}")
+
     acc_train = np.array(acc_train)
     acc_valid = np.array(acc_valid)
     fig = plt.figure()
@@ -77,30 +75,13 @@ def select_knn_model(
     fig.savefig(f"knn_accuracy_{metric}.png")
 
     # Find the best k, if k is tied, choose the k with the smallest gap between training and validation accuracy
-    best_acc = -float("inf")
-    best_k = -1
-    best_k_ind = -1
-    best_gap = float("inf")
-    for count, (i, j) in enumerate(zip(acc_train, acc_valid)):
-        train_acc = i[1]
-        valid_acc = j[2]
-        gap = abs(train_acc - valid_acc)
-        if valid_acc > best_acc:
-            best_acc = valid_acc
-            best_k = i[0]
-            best_k_ind = count
-            best_gap = gap
-        elif valid_acc == best_acc:
-            if gap < best_gap:
-                best_k = i[0]
-                best_k_ind = count
-                best_gap = gap
+    best_k_ind = np.argmax(acc_valid[:, -1])
+    best_k = acc_valid[best_k_ind][1]
+    best_acc = acc_valid[best_k_ind][2]
     print(
         f"-----------------------{metric.capitalize()} Distance-----------------------"
     )
-    print(
-        f"Best k: {int(best_k)} / Best KNN validation accuracy: {best_acc} / Train-Valid Gap: {best_gap}"
-    )
+    print(f"Best k: {int(best_k)} / Best KNN validation accuracy: {best_acc}")
     acc_test = acc_valid[best_k_ind][0].score(X_test, y_test)
     print(f"Test accuracy: {acc_test}\n")
 
