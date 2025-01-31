@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-01-17 02:43:16
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-01-29 11:31:49
+LastEditTime : 2025-01-31 02:04:24
 FilePath     : /LMP1210_Winter_2025/A1/A1_code.py
 Description  : python script for problem 4,5,6 in A1
 I Love IU
@@ -82,7 +82,8 @@ def select_knn_model(
         f"-----------------------{metric.capitalize()} Distance-----------------------"
     )
     print(f"Best k: {int(best_k)} / Best KNN validation accuracy: {best_acc}")
-    acc_test = acc_valid[best_k_ind][0].score(X_test, y_test)
+    classifier = acc_valid[best_k_ind][0]
+    acc_test = classifier.score(X_test, y_test)
     print(f"Test accuracy: {acc_test}\n")
 
 
