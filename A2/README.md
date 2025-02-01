@@ -17,6 +17,7 @@ python A2_code.py
 ## Expected output
 
 - `Q2a_random_forest_accuracy.png`
+- `Q2a_classifier_comparison.png`
 - `Q2b_binary_feature_importance.png`
 - `Q3a_binary_classification.png`
 - `Q3b_bianry_classification.png`
