@@ -5,7 +5,7 @@
 ```bash
 conda create -n a1 python=3.10 -y
 conda activate a1
-pip install scikit-learn pandas numpy matplotlib seaborn umap-learn
+pip install scikit-learn pandas numpy matplotlib seaborn umap-learn, torch
 ```
 
 ## Run the code

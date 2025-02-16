@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-02-14 20:26:03
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-02-15 20:30:38
+LastEditTime : 2025-02-16 04:40:15
 FilePath     : /LMP1210_Winter_2025/A3/A3_code.py
 Description  : python script for problem 1, 4, 5 and 7 in A3
 I Love IU
@@ -13,19 +13,23 @@ Copyright (c) 2025 by Chris Xiao yl.xiao@mail.utoronto.ca, All Rights Reserved.
 
 import pandas as pd
 import numpy as np
+import torch
 import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans
+from sklearn.metrics import adjusted_mutual_info_score
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-import umap as UMAP
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import adjusted_rand_score
 from sklearn.model_selection import train_test_split
+import umap as UMAP
+from autoencoder import AutoEncoderTrainer, check_device
 from typing import Tuple
 import time
 import warnings
 import os
+import argparse
 
 # Disable OpenMP warnings
 os.environ["KMP_WARNINGS"] = "0"
@@ -85,9 +89,6 @@ def plot_decision_boundary(clf, X, y, title: str) -> None:
     plt.legend(title="Cell Types")
     fig.savefig(f"Q4Pd{title}.png")
 
-
-def train_autoencoder():
-    pass
 
 def P1(
     x_train: pd.DataFrame,
@@ -237,7 +238,13 @@ def P4(X_data: pd.DataFrame, y_data: pd.DataFrame) -> None:
     )
 
 
-def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> None:
+def P5(
+    rna_seq: pd.DataFrame,
+    dna_seq: pd.DataFrame,
+    labels: pd.DataFrame,
+    pretrain_path: str = None,
+    train: bool = False,
+) -> None:
     class_labels = np.unique(labels["label"])
     label_to_index = {label: idx for idx, label in enumerate(class_labels)}
     indexed_labels = np.array([label_to_index[label] for label in labels["label"]])
@@ -249,7 +256,7 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
             [0],
             marker="o",
             color="w",
-            markerfacecolor=cmap((i-1) / (len(class_labels)-1)),
+            markerfacecolor=cmap((i - 1) / (len(class_labels) - 1)),
             markersize=10,
             label=f"Subtype {i}",
         )
@@ -271,7 +278,7 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
     ax[0].set_ylabel("PC2")
     ax[0].set_title("PCA Scatter plot of RNA-seq data")
     ax[0].legend(handles=handles, title="Cancer Subtypes")
-    
+
     tsne = TSNE(n_components=2, random_state=17)
     rna_tsne = tsne.fit_transform(rna_seq)
     ax[1].scatter(
@@ -286,7 +293,7 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
     ax[1].set_ylabel("t-SNE Embedding 2")
     ax[1].set_title("t-SNE Scatter plot of RNA-seq data")
     ax[1].legend(handles=handles, title="Cancer Subtypes")
-    
+
     umap = UMAP.UMAP(n_components=2, random_state=17)
     rna_umap = umap.fit_transform(rna_seq)
     ax[2].scatter(
@@ -304,13 +311,13 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
     plt.tight_layout()
     fig.savefig("Q5Pa.png")
     print("Saving scatter plots of PCA, t-SNE and UMAP as 'Q5Pa.png'\n")
-    
+
     kmean = KMeans(n_clusters=len(class_labels), random_state=17)
     kmean.fit(rna_seq)
     kmean_pred = kmean.predict(rna_seq)
     kmean_score = adjusted_rand_score(indexed_labels, kmean_pred)
     print(f"Kmeans ARI score for RNA-seq data: {kmean_score}\n")
-    
+
     print("-----------------------Problem 5b-----------------------\n")
     fig, ax = plt.subplots(1, 3, figsize=(24, 8))
     pca = PCA(n_components=2, random_state=17)
@@ -327,7 +334,7 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
     ax[0].set_ylabel("PC2")
     ax[0].set_title("PCA Scatter plot of Methylation data")
     ax[0].legend(handles=handles, title="Cancer Subtypes")
-    
+
     tsne = TSNE(n_components=2, random_state=17)
     dna_tsne = tsne.fit_transform(dna_seq)
     ax[1].scatter(
@@ -342,7 +349,7 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
     ax[1].set_ylabel("t-SNE Embedding 2")
     ax[1].set_title("t-SNE Scatter plot of Methylation data")
     ax[1].legend(handles=handles, title="Cancer Subtypes")
-    
+
     umap = UMAP.UMAP(n_components=2, random_state=17)
     dna_umap = umap.fit_transform(dna_seq)
     ax[2].scatter(
@@ -359,19 +366,72 @@ def P5(rna_seq: pd.DataFrame, dna_seq: pd.DataFrame, labels: pd.DataFrame) -> No
     ax[2].legend(handles=handles, title="Cancer Subtypes")
     plt.tight_layout()
     fig.savefig("Q5Pb.png")
-    print("Saving scatter plots of PCA, t-SNE and UMAP as 'Q5Pa.png'\n")
-    
+    print("Saving scatter plots of PCA, t-SNE and UMAP as 'Q5Pb.png'\n")
+
     kmean = KMeans(n_clusters=len(class_labels), random_state=17)
     kmean.fit(dna_seq)
     kmean_pred = kmean.predict(dna_seq)
     kmean_score = adjusted_rand_score(indexed_labels, kmean_pred)
     print(f"Kmeans ARI score for Methylation data: {kmean_score}\n")
-    
-    
+
     print("-----------------------Problem 5c-----------------------\n")
-    pass
+
+    # Concatenate RNA-seq and Methylation data
+    combined_seq = np.concatenate((rna_seq, dna_seq), axis=1)
+    num_features = combined_seq.shape[1]
+
+    combined_seq_tensor = torch.tensor(combined_seq, dtype=torch.float32)
+    combined_seq_dataloader = torch.utils.data.DataLoader(
+        combined_seq_tensor, batch_size=64, shuffle=True
+    )
+
+    device = check_device()
+    autoencoder = AutoEncoderTrainer(
+        input_dim=num_features, num_epochs=3000, device=device
+    )
+    if train:
+        autoencoder.train(combined_seq_dataloader)
+    latent = autoencoder.get_latent_representation(combined_seq_tensor, pretrain_path)
+    latent = latent.detach().cpu().numpy()
+
+    umap = UMAP.UMAP(n_components=2, random_state=6)
+    combined_umap = umap.fit_transform(latent)
+    fig = plt.figure(figsize=(8, 8))
+    plt.scatter(
+        combined_umap[:, 0],
+        combined_umap[:, 1],
+        c=indexed_labels,
+        cmap="tab10",
+        edgecolors="k",
+        alpha=0.7,
+    )
+    plt.xlabel("UMAP Embedding 1")
+    plt.ylabel("UMAP Embedding 2")
+    plt.title("UMAP Visualization of Patient Latent Representations")
+    plt.legend(handles=handles, title="Cancer Subtypes")
+    fig.savefig("Q5Pc.png")
+
+    kmeans = KMeans(n_clusters=len(class_labels), random_state=48, n_init=10)
+    kmeans_pred = kmeans.fit_predict(latent)
+    kmeans_ami_score = adjusted_mutual_info_score(indexed_labels, kmeans_pred)
+    print(f"Kmeans AMI score for latent representation: {kmeans_ami_score}\n")
+
 
 if __name__ == "__main__":
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument(
+        "--train", action="store_true", help="Train the autoencoder model"
+    )
+    argparser.add_argument(
+        "--pretrain",
+        type=str,
+        default=None,
+        help="Path to the pre-trained autoencoder model",
+    )
+    args = argparser.parse_args()
+    train = args.train
+    pretrain_path = args.pretrain
+
     ##############################################
     # Problem 1 - Revisiting Single-Cell RNA-seq #
     ##############################################
@@ -410,8 +470,16 @@ if __name__ == "__main__":
     # Problem 5 - Multi-Omics Analysis for Cancer Subtyping #
     #########################################################
 
-    rna_seq = pd.read_csv("A3_data/A3RNAseq.csv").dropna(how="all").drop(columns=["Unnamed: 0"])
-    dna_seq = pd.read_csv("A3_data/A3Methylation.csv").dropna(how="all").drop(columns=["Unnamed: 0"])
+    rna_seq = (
+        pd.read_csv("A3_data/A3RNAseq.csv")
+        .dropna(how="all")
+        .drop(columns=["Unnamed: 0"])
+    )
+    dna_seq = (
+        pd.read_csv("A3_data/A3Methylation.csv")
+        .dropna(how="all")
+        .drop(columns=["Unnamed: 0"])
+    )
     labels = pd.read_csv("A3_data/label.csv").dropna(how="all")
 
-    P5(rna_seq, dna_seq, labels)
+    P5(rna_seq, dna_seq, labels, pretrain_path, train)
