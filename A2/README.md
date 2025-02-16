@@ -1,4 +1,4 @@
-# Instruction for Assignment 1
+# Instruction for Assignment 2
 
 ## Install the required packages
 
