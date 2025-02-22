@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-02-14 20:26:03
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-02-16 04:40:15
+LastEditTime : 2025-02-22 01:21:10
 FilePath     : /LMP1210_Winter_2025/A3/A3_code.py
 Description  : python script for problem 1, 4, 5 and 7 in A3
 I Love IU
@@ -101,7 +101,7 @@ def P1(
     for k in ks:
         start_kmeans = time.time()
         # kmeans model
-        kmeans = KMeans(n_clusters=k, init="k-means++", random_state=17)
+        kmeans = KMeans(n_clusters=k, init="k-means++", n_init=4, random_state=0)
         kmeans.fit(x_train)
         kmeans_pred = kmeans.predict(x_test)
         kmeans_score = adjusted_rand_score(y_test, kmeans_pred)
@@ -111,7 +111,9 @@ def P1(
         )
         # GMM model
         start_gmm = time.time()
-        gmm = GaussianMixture(n_components=k, init_params="k-means++", random_state=17)
+        gmm = GaussianMixture(
+            n_components=k, init_params="k-means++", n_init=4, random_state=0
+        )
         gmm.fit(x_train)
         gmm_pred = gmm.predict(x_test)
         gmm_score = adjusted_rand_score(y_test, gmm_pred)
@@ -141,7 +143,7 @@ def P4(X_data: pd.DataFrame, y_data: pd.DataFrame) -> None:
     pca = PCA(random_state=17)
     pca.fit(X_data)
     explained_variance_ratio = pca.explained_variance_ratio_
-    cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
+    cumulative_variance = np.cumsum(explained_variance_ratio)
     print(
         f"Number of components needed to explain 80% variance: {np.argmax(cumulative_variance >= 0.8) + 1}\n"
     )
@@ -215,11 +217,12 @@ def P4(X_data: pd.DataFrame, y_data: pd.DataFrame) -> None:
     plot_decision_boundary(classifier_low, X_pca_low, y_data, "Bottom")
 
     print("-----------------------Problem 4e-----------------------\n")
-    pca = PCA(n_components=10, random_state=17)
+    pca = PCA(random_state=17)
     X_pca = pca.fit_transform(X_data)
     scores = []
     for k in range(1, 11):
         X_pca_k = X_pca[:, :k]
+        print(X_pca_k.shape)
         clf = LogisticRegression(random_state=17)
         clf.fit(X_pca_k, y_data)
         score = clf.score(X_pca_k, y_data)
