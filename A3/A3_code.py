@@ -4,9 +4,9 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-02-14 20:26:03
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-02-22 01:21:10
+LastEditTime : 2025-02-25 13:44:37
 FilePath     : /LMP1210_Winter_2025/A3/A3_code.py
-Description  : python script for problem 1, 4, 5 and 7 in A3
+Description  : python script for problem 1, 4, 5 in A3
 I Love IU
 Copyright (c) 2025 by Chris Xiao yl.xiao@mail.utoronto.ca, All Rights Reserved.
 """
@@ -97,7 +97,7 @@ def P1(
     y_test: pd.DataFrame,
 ) -> None:
     ks = [2, 4, 6, 8]
-    print("-----------------------Problem 1-----------------------\n")
+    print("\n-----------------------Problem 1-----------------------\n")
     for k in ks:
         start_kmeans = time.time()
         # kmeans model
@@ -222,7 +222,6 @@ def P4(X_data: pd.DataFrame, y_data: pd.DataFrame) -> None:
     scores = []
     for k in range(1, 11):
         X_pca_k = X_pca[:, :k]
-        print(X_pca_k.shape)
         clf = LogisticRegression(random_state=17)
         clf.fit(X_pca_k, y_data)
         score = clf.score(X_pca_k, y_data)
@@ -394,6 +393,7 @@ def P5(
     )
     if train:
         autoencoder.train(combined_seq_dataloader)
+        pretrain_path = None
     latent = autoencoder.get_latent_representation(combined_seq_tensor, pretrain_path)
     latent = latent.detach().cpu().numpy()
 
@@ -452,7 +452,7 @@ if __name__ == "__main__":
         X_data_P1, y_data_P1, test_size=0.3, random_state=1
     )
 
-    # P1(X_train_P1, y_train_P1, X_test_P1, y_test_P1)
+    P1(X_train_P1, y_train_P1, X_test_P1, y_test_P1)
 
     ############################################
     # Problem 4 - Principal Component Analysis #
@@ -467,7 +467,7 @@ if __name__ == "__main__":
         data_P4["Cell Type"],
     )
 
-    # P4(X_data_P4, y_data_P4)
+    P4(X_data_P4, y_data_P4)
 
     #########################################################
     # Problem 5 - Multi-Omics Analysis for Cancer Subtyping #

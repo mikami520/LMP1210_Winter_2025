@@ -3,24 +3,30 @@
 ## Install the required packages
 
 ```bash
-conda create -n a1 python=3.10 -y
-conda activate a1
-pip install scikit-learn pandas numpy matplotlib seaborn umap-learn, torch
+conda create -n a3 python=3.10 -y
+conda activate a3
+pip install scikit-learn pandas numpy matplotlib seaborn umap-learn torch torchvision torchaudio
 ```
 
 ## Run the code
 
+- `A3_code.py` is the main code for this assignment
+- `autoencoder.py` is the file that contains the autoencoder model.
+
 ```bash
-python A3_code.py
+python A3_code.py \
+--train # if need to train the model
+--pretrain # path to the pretrained autoencoder model, provided by **autoencoder_best.pth**. If set to train, this will be ignored. 
 ```
 
 ## Expected output
 
-- `Q2a_random_forest_accuracy.png`
-- `Q2a_classifier_comparison.png`
-- `Q2b_binary_feature_importance.png`
-- `Q3a_binary_classification.png`
-- `Q3b_bianry_classification.png`
-- `Q6b_xgboost_feature_importance.png`
-- `Q6b_mlp_feature_importance.png`
-- `A2Q5.pptx` (PowerPoint file for computational graph)
+- `Q2.pdf` (Answer to Q2)
+- `Q4Pc_largePC.png`
+- `Q4Pc_smallPC.png`
+- `Q4PdBottom.png`
+- `Q4PdTop.png`
+- `Q4Pe.png`
+- `Q5Pa.png`
+- `Q5Pb.png`
+- `Q5Pc.png`
