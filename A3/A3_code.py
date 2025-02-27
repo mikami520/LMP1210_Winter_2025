@@ -4,7 +4,7 @@
 Author       : Chris Xiao yl.xiao@mail.utoronto.ca
 Date         : 2025-02-14 20:26:03
 LastEditors  : Chris Xiao yl.xiao@mail.utoronto.ca
-LastEditTime : 2025-02-25 13:44:37
+LastEditTime : 2025-02-27 14:38:25
 FilePath     : /LMP1210_Winter_2025/A3/A3_code.py
 Description  : python script for problem 1, 4, 5 in A3
 I Love IU
@@ -166,6 +166,7 @@ def P4(X_data: pd.DataFrame, y_data: pd.DataFrame) -> None:
             color=colors[i],
             label=f"{cell_types[i]}",
             edgecolors="k",
+            s=30,
             alpha=0.7,
         )
     plt.xlabel("Second Largest PC")
@@ -184,6 +185,7 @@ def P4(X_data: pd.DataFrame, y_data: pd.DataFrame) -> None:
             color=colors[i],
             label=f"{cell_types[i]}",
             edgecolors="k",
+            s=30,
             alpha=0.7,
         )
     plt.xlabel("Smallest PC")
